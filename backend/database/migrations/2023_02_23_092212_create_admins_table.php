@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('email');
             $table->string('password');
+            $table->unsignedBigInteger('admin_created_id');
+            $table->foreign('admin_created_id')->references('id')->on('admins')->onDelete('cascade');
             
 
             $table->timestamps();
