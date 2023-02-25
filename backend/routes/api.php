@@ -42,6 +42,8 @@ Route::Get('/classes',[ClassesController::class,'GetClass']);
 Route::Get('/classes/{id}',[ClassesController::class,'getClassById']);
 Route::delete('/classes/{id}',[ClassesController::class,'deleteClass']);
 Route::Patch('/classes/{id}',[ClassesController::class,'updateClass']);
+Route::Get('/classes/name/{name}',[ClassesController::class,'getClassByName']);
+
 
 
 

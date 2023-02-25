@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Section;
 use App\Models\Classes;
-
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
+
 
 class SectionController extends Controller
 {
@@ -15,14 +15,14 @@ class SectionController extends Controller
         $Section = new Section;
         $name = $request->input('name');
         $class_id = $request->input('class_id');
-        #$class = Class::find($class_id);
+        $classes = Classes::find($class_id);
         $capacity=$request->input('capacity');
         $content=$request->input('content');
         $Section->name=$name;
         $Section->capacity=$capacity;
         $Section->content=$content;
         $Section->class_id=$class_id;
-        #$Section->class()->associate($class);
+        $Section->classes()->associate($classes);
         $Section->save();
         return response()->json([
             'message' => 'Section created successfully!',
@@ -33,8 +33,8 @@ class SectionController extends Controller
 
 
     public function getSection(Request $request, $id){
-       # $Section =  Section::where('id',$id)->with(['Classes'])->get();
-       $Section =  Section::where('id',$id)->get();
+       $Section =  Section::where('id',$id)->with(['Classes'])->get();
+    //    $Section =  Section::where('id',$id)->get();
         return response()->json([
             'message' => $Section,
      
@@ -43,7 +43,7 @@ class SectionController extends Controller
 
     public function getAllSection(Request $request){
        # $Section =  Section::get();
-        $Section =  Section::get();
+        $Section =  Section::with(['Classes'])->get();
         return response()->json([
             'message' => $Section,
     

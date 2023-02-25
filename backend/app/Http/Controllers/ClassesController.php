@@ -37,6 +37,14 @@ class ClassesController extends Controller
             ]);
         }
 
+
+        public function getClassByName(Request $request, $name){
+            $Classes=Classes::where('name',$name)->get();
+            return response()->json([
+                "message"=>$Classes
+            ]);
+        }
+
         public function deleteClass(Request $request, $id){
             $Classes=Classes::find($id);
             $Classes->delete();

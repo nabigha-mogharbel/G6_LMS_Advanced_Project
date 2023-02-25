@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Classes;
+use App\Models\Student;
 
 class Section extends Model
 {
@@ -17,11 +19,11 @@ class Section extends Model
     ];
 
 public function classes() {
-    return $this->belongsTo(Classes::class);
+    return $this->belongsTo(Classes::class,"class_id","id");
 }
 
 public function students() {
-    return $this->hasMany(students::class);
+    return $this->hasMany(Student::class);
 }
 
 }
