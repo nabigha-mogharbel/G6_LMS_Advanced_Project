@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Classes;
 use App\Models\Student;
+use App\Models\Detail;
 
 class Section extends Model
 {
@@ -24,6 +25,10 @@ public function classes() {
 
 public function students() {
     return $this->hasMany(Student::class);
+}
+
+public function details(){
+    return $this->belongsTo(Detail::class,"detail_id","id");
 }
 
 }

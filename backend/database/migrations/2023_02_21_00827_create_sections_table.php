@@ -16,11 +16,14 @@ return new class extends Migration
             $table->string('name');
             $table->unsignedBigInteger('class_id');
             $table->foreign('class_id')->references('id')->on('classes')->onDelete('cascade');
-            $table->string('capacity');
-            $table->string('content');
+            $table->integer('capacity');
+            $table->string('time_order');
+            $table->unsignedBigInteger('detail_id');
+            $table->foreign('detail_id')->references('id')->on('details')->onDelete('cascade');
             $table->timestamps();
         });
     }
+    
 // detail_id : foring key 
 //detail :one to many 
 // Type / description/picture
@@ -30,7 +33,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sections');-b 
+        Schema::dropIfExists('sections');
         
     }
 };

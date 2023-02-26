@@ -7,6 +7,8 @@ use App\Models\Section;
 use App\Models\Classes;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
+use App\Models\Detail;
+
 
 
 class SectionController extends Controller
@@ -14,15 +16,30 @@ class SectionController extends Controller
     public function addSection(Request $request){
         $Section = new Section;
         $name = $request->input('name');
+
+
+
         $class_id = $request->input('class_id');
         $classes = Classes::find($class_id);
+
+
+        $detail_id =$request->input('detail_id');
+        $details =Detail::find($detail_id);
+
         $capacity=$request->input('capacity');
-        $content=$request->input('content');
+
+        $time_order=$request->input('time_order');
+
         $Section->name=$name;
         $Section->capacity=$capacity;
-        $Section->content=$content;
+        $Section->time_order=$time_order;
+
         $Section->class_id=$class_id;
         $Section->classes()->associate($classes);
+
+        $Section->detail_id=$detail_id;
+        $Section->details()->associate($details);
+
         $Section->save();
         return response()->json([
             'message' => 'Section created successfully!',
@@ -34,10 +51,8 @@ class SectionController extends Controller
 
     public function getSection(Request $request, $id){
        $Section =  Section::where('id',$id)->with(['Classes'])->get();
-    //    $Section =  Section::where('id',$id)->get();
         return response()->json([
             'message' => $Section,
-     
         ]);
     }
 

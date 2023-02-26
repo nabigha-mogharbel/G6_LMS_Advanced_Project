@@ -6,6 +6,10 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ClassesController;
+use App\Http\Controllers\DetailController;
+
+
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -43,6 +47,13 @@ Route::Get('/classes/{id}',[ClassesController::class,'getClassById']);
 Route::delete('/classes/{id}',[ClassesController::class,'deleteClass']);
 Route::Patch('/classes/{id}',[ClassesController::class,'updateClass']);
 Route::Get('/classes/name/{name}',[ClassesController::class,'getClassByName']);
+
+Route::Post('/details',[DetailController::class,'AddDetail']);
+Route::Get('/details',[DetailController::class,'GetDetail']);
+Route::Get('/details/{id}',[DetailController::class,'getDetailById']);
+Route::delete('/details/{id}',[DetailController::class,'deleteDetail']);
+Route::Patch('/details/{id}',[DetailController::class,'editDetail']);
+Route::Get('/details/type/{type}',[DetailController::class,'getDetailByType']);
 
 
 
