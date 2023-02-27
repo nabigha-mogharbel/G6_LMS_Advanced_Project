@@ -11,43 +11,63 @@ use Laravel\Sanctum\Sanctum;
 
 class SectionController extends Controller
 {
+
     public function addSection(Request $request){
+        try {
         $Section = new Section;
         $name = $request->input('name');
         $class_id = $request->input('class_id');
-        #$class = Class::find($class_id);
+        $class = Classes::find($class_id);
         $capacity=$request->input('capacity');
         $content=$request->input('content');
         $Section->name=$name;
         $Section->capacity=$capacity;
         $Section->content=$content;
         $Section->class_id=$class_id;
-        #$Section->class()->associate($class);
+        $Section->class()->associate($class);
         $Section->save();
         return response()->json([
             'message' => 'Section created successfully!',
 
         ]);
+    } catch (\Exception $e) {
+        // Handle the exception here
+        return response()->json([
+            'error' => $e->getMessage(),
+        ], 500);
+    }
 
     }
 
 
     public function getSection(Request $request, $id){
-       # $Section =  Section::where('id',$id)->with(['Classes'])->get();
+        try {
        $Section =  Section::where('id',$id)->get();
         return response()->json([
             'message' => $Section,
 
         ]);
+    } catch (\Exception $e) {
+        // Handle the exception here
+        return response()->json([
+            'error' => $e->getMessage(),
+        ], 500);
+    }
     }
 
     public function getAllSection(Request $request){
-       # $Section =  Section::get();
+        try {
         $Section =  Section::get();
         return response()->json([
             'message' => $Section,
 
         ]);
+    } catch (\Exception $e) {
+            // Handle the exception here
+            return response()->json([
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function deleteSection(Request $request, $id){
@@ -57,6 +77,7 @@ class SectionController extends Controller
         return response()->json([
             'message' => 'Section deleted Successfully!',
         ]);
+        
     }
 
 
