@@ -24,8 +24,11 @@ class ClassesController extends Controller
         $class = new Classes();
         $name = $request->input('name');
         $floor = $request->input('floor');
+        $color =$request->input('color');
         $class->name = $name;
         $class->floor = $floor;
+        $class->color = $color;
+        
         $class->save();
         return response()->json([
             "message" => "Class added successfully"
@@ -37,6 +40,22 @@ class ClassesController extends Controller
         $class = Classes::paginate(5);
         return response()->json([
             "message" => $class
+        ], 200);
+    }
+
+    public function getClassSort(Request $request)
+    {
+        $classes = Classes::orderBy('name')->paginate(5);
+        return response()->json([
+            "message" => $classes,
+        ], 200);
+    }
+
+    public function getClassSortByFloor(Request $request)
+    {
+        $classes = Classes::orderBy('floor')->paginate(5);
+        return response()->json([
+            "message" => $classes,
         ], 200);
     }
 

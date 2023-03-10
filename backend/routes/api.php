@@ -17,7 +17,7 @@ use App\Http\Controllers\AuthController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
+// 
 Route::group([
     'middleware' => 'api',
     'prefix' => 'auth'
@@ -33,6 +33,9 @@ Route::group([
 
     Route::Post('/classes', [ClassesController::class, 'AddClass']);    
     Route::Get('/classes', [ClassesController::class, 'GetClass']);
+    Route::Get('/classes/sort', [ClassesController::class, 'GetClassSort']);
+    Route::Get('/classes/sort/floor', [ClassesController::class, 'getClassSortByFloor']);
+
     Route::Get('/classes/{id}', [ClassesController::class, 'getClassById']);
     Route::delete('/classes/{id}', [ClassesController::class, 'deleteClass']);
     Route::Patch('/classes/{id}', [ClassesController::class, 'updateClass']);
