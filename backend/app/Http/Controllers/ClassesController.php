@@ -24,8 +24,11 @@ class ClassesController extends Controller
         $class = new Classes();
         $name = $request->input('name');
         $floor = $request->input('floor');
+        $color =$request->input('color');
         $class->name = $name;
         $class->floor = $floor;
+        $class->color = $color;
+        
         $class->save();
         return response()->json([
             "message" => "Class added successfully"
