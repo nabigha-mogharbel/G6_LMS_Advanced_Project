@@ -43,6 +43,22 @@ class ClassesController extends Controller
         ], 200);
     }
 
+    public function getClassSort(Request $request)
+    {
+        $classes = Classes::orderBy('name')->paginate(5);
+        return response()->json([
+            "message" => $classes,
+        ], 200);
+    }
+
+    public function getClassSortByFloor(Request $request)
+    {
+        $classes = Classes::orderBy('floor')->paginate(5);
+        return response()->json([
+            "message" => $classes,
+        ], 200);
+    }
+
     public function getClassById(Request $request, $id)
     {
         $Classes = Classes::where('id', $id)->get();
