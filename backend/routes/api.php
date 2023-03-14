@@ -56,8 +56,15 @@ Route::group([
     Route::Post("/attendance", [AttendanceController::class, "addAttendance"]);
     Route::Get("/attendance/{id}", [AttendanceController::class, "getAttendanceById"]);
     Route::Get("/attendance", [AttendanceController::class, "getAllAttendance"]);
+    Route::Get("/attendance/one-date/{date}",[AttendanceController::class, "getAttendanceByOneDate"]);
+    Route::Get("/attendance/start-date/{sdate}/end-date/{edate}", [AttendanceController::class, "getAttendanceByDate"]);
     Route::Get("/attendance/section/{section_id}", [AttendanceController::class, "getAttendanceBySection"]);
     Route::Get("/attendance/student/{student_id}", [AttendanceController::class, "getAttendanceByStudent"]);
+    Route::Get("/attendance/class/{class_id}", [AttendanceController::class, "getAttendanceByClass"]);
+    Route::Get("/attendance/class/{class_id}/start-date/{sdate}/end-date/{edate}", [AttendanceController::class, "getAttendanceByClassWithDate"]);
+    Route::Get("/attendance/student/{student_id}/start-date/{sdate}/end-date/{edate}", [AttendanceController::class, "getAttendanceByStudentWithDate"]);
+    Route::Get("/attendance/section/{student_id}/start-date/{sdate}/end-date/{edate}", [AttendanceController::class, "getAttendanceBySectionWithDate"]);
     Route::delete("/attendance/{id}", [AttendanceController::class, "deleteAttendanceById"]);
     Route::Patch("/attendance/update/{id}", [AttendanceController::class, "updateAttendance"]);
+    Route::Patch("/attendance/update/student/{student_id}/section/{section_id}/date/{date}", [AttendanceController::class, "updateAttendanceBySSD"]);
 });
