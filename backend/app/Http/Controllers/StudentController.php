@@ -49,6 +49,14 @@ class StudentController extends Controller
             "message"=>$students
         ]);
     }
+
+        public function sortStudents(Request $request){
+        $students=Student::with(["section"])->orderBy('first_name')->paginate(5);
+        return response()->json([
+            "message"=>$students
+        ]);
+    }
+
     public function getStudentById(Request $request, $id){
         $student=Student::find($id)->with(["Section"])->get();
         if($student->isEmpty()){

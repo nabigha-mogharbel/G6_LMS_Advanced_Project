@@ -56,6 +56,8 @@ class SectionController extends Controller
         ]);
     }
 
+    
+
     public function getSectionByname($name)
     {
         $Section = Section::where('name', $name)->with(['Class'])->paginate(10);
@@ -74,6 +76,14 @@ class SectionController extends Controller
     public function getAllSection(Request $request)
     {
         $Section =  Section::with(["Class"])->paginate(5);
+        return response()->json([
+            'message' => $Section,
+        ]);
+    }
+
+        public function sortAllSection(Request $request)
+    {
+        $Section =  Section::with(["Class"])->orderBy('name')->paginate(5);
         return response()->json([
             'message' => $Section,
         ]);
