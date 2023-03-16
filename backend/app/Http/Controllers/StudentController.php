@@ -49,6 +49,43 @@ class StudentController extends Controller
             "message"=>$students
         ]);
     }
+
+    //Begin the sorting hby first-name, last-name, email, phone-number
+    public function getStudentsSortByFirst_name(Request $request)
+    {
+        $students=Student::with(["section"])->orderBy('first_name')->paginate(5);
+        return response()->json([
+            "message"=>$students
+        ]);
+    }
+
+    public function getStudentsSortByLast_name(Request $request)
+    {
+        $students=Student::with(["section"])->orderBy('last_name')->paginate(5);
+        return response()->json([
+            "message"=>$students
+        ]);
+    }
+
+    public function getStudentsSortByEmail(Request $request)
+        {
+            $students=Student::with(["section"])->orderBy('email')->paginate(5);
+            return response()->json([
+                "message"=>$students
+            ]);
+        }
+
+    public function getStudentsSortByPhone_number(Request $request)
+        {
+            $students=Student::with(["section"])->orderBy('phone_number')->paginate(5);
+            return response()->json([
+                "message"=>$students
+            ]);
+        }
+    //finishing the sorting here
+    
+
+    
     public function getStudentById(Request $request, $id){
         $student=Student::find($id)->with(["Section"])->get();
         if($student->isEmpty()){

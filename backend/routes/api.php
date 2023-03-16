@@ -34,11 +34,14 @@ Route::group([
     Route::Post('/classes', [ClassesController::class, 'AddClass']);    
     Route::Get('/classes', [ClassesController::class, 'GetClass']);
     Route::Get('/classes/sort', [ClassesController::class, 'GetClassSort']);
-    Route::Get('/classes/sort/floor', [ClassesController::class, 'getClassSortByFloor']);
-
     Route::Get('/classes/{id}', [ClassesController::class, 'getClassById']);
     Route::delete('/classes/{id}', [ClassesController::class, 'deleteClass']);
     Route::Patch('/classes/{id}', [ClassesController::class, 'updateClass']);
+    //Routes for sorting
+    Route::Get('/classes/sort/name', [ClassesController::class, 'getClassSortByName']);
+    Route::Get('/classes/sort/floor', [ClassesController::class, 'getClassSortByFloor']);
+    Route::Get('/classes/sort/color', [ClassesController::class, 'getClassSortByColor']);
+
 
     Route::Post("/students", [StudentController::class, "addStudent"]);
     Route::Get("/students/{id}", [StudentController::class, "getStudentById"]);
@@ -46,12 +49,26 @@ Route::group([
     Route::Get("/students/{section_id}", [StudentController::class, "getStudentsBySection"]);
     Route::delete("/students/{id}", [StudentController::class, "deleteStudentById"]);
     Route::Patch("/students/update/{id}", [StudentController::class, "updateStudent"]);
+    //Route for sorting
+    Route::Get('/students/sort/firstname', [StudentController::class, 'getStudentsSortByFirst_name']);
+    Route::Get('/students/sort/lastname', [StudentController::class, 'getStudentsSortByLast_name']);
+    Route::Get('/students/sort/email', [StudentController::class, 'getStudentsSortByEmail']);
+    Route::Get('/students/sort/phonenumber', [StudentController::class, 'getStudentsSortByPhone_number']);
+
+    
 
     Route::Post('/sections', [SectionController::class, 'addSection']);
     Route::Get('/sections', [SectionController::class, 'getAllSection']);
     Route::Get('/sections/{id}', [SectionController::class, 'getSection']);
     Route::Patch('/sections/{id}', [SectionController::class, 'editSection']);
     Route::delete('/sections/{id}', [SectionController::class, 'deleteSection']);
+    //Route for sorting
+    Route::Get('/sections/sort/name', [SectionController::class, 'getSectionSortByName']);
+    Route::Get('/sections/sort/capacity', [SectionController::class, 'getSectionSortByCapacity']);
+    Route::Get('/sections/sort/classid', [SectionController::class, 'getSectionSortByClass_id']);
+
+
+    
 
     Route::Post("/attendance", [AttendanceController::class, "addAttendance"]);
     Route::Get("/attendance/{id}", [AttendanceController::class, "getAttendanceById"]);

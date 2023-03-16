@@ -43,7 +43,7 @@ class ClassesController extends Controller
         ], 200);
     }
 
-    public function getClassSort(Request $request)
+    public function getClassSortByName(Request $request)
     {
         $classes = Classes::orderBy('name')->paginate(5);
         return response()->json([
@@ -54,6 +54,14 @@ class ClassesController extends Controller
     public function getClassSortByFloor(Request $request)
     {
         $classes = Classes::orderBy('floor')->paginate(5);
+        return response()->json([
+            "message" => $classes,
+        ], 200);
+    }
+
+        public function getClassSortByColor(Request $request)
+    {
+        $classes = Classes::orderBy('color')->paginate(5);
         return response()->json([
             "message" => $classes,
         ], 200);
