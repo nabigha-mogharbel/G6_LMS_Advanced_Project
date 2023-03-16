@@ -73,7 +73,7 @@ class SectionController extends Controller
         ]);
     }
 
-    public function getAllSection(Request $request)
+        public function getAllSection(Request $request)
     {
         $Section =  Section::with(["Class"])->paginate(5);
         return response()->json([
@@ -81,13 +81,45 @@ class SectionController extends Controller
         ]);
     }
 
-        public function sortAllSection(Request $request)
+        public function get(Request $request)
     {
         $Section =  Section::with(["Class"])->orderBy('name')->paginate(5);
         return response()->json([
             'message' => $Section,
         ]);
     }
+
+
+    
+    //Sorting is begin here
+    public function getSectionSortByName(Request $request)
+        {
+            $Section =  Section::with(["Class"])->orderBy('name')->paginate(5);
+            return response()->json([
+                'message' => $Section,
+            ]);
+        }
+
+    public function getSectionSortByCapacity(Request $request)
+        {
+            $Section =  Section::with(["Class"])->orderBy('capacity')->paginate(5);
+            return response()->json([
+                'message' => $Section,
+            ]);
+        }
+        //Sorting is finished here
+
+
+
+
+
+    public function getSectionSortByClass_id(Request $request)
+        {
+            $Section =  Section::with(["Class"])->orderBy('class_id')->paginate(5);
+            return response()->json([
+                'message' => $Section,
+            ]);
+        }
 
     public function deleteSection(Request $request, $id)
     {
