@@ -17,8 +17,11 @@ return new class extends Migration
             $table->foreign('section_id')->references('id')->on('sections');
             $table->unsignedBigInteger('student_id');
             $table->foreign('student_id')->references('id')->on('students');
+            $table->unsignedBigInteger('class_id');
+            $table->foreign('class_id')->references('id')->on('classes');
             $table->string("status");
             $table->date("date");
+            $table->timestamps();
         });
     }
 

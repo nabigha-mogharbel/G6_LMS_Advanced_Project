@@ -25,6 +25,6 @@ public function Student() {
     return $this->hasMany(Student::class);
 }
 public function Attendance() {
-    return $this->belongsToMany(Student::class, "attendances", "section_id" ,"student_id");
+    return $this->hasMany(Student::class);
 }
 }

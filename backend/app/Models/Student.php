@@ -15,6 +15,6 @@ class Student extends Model
        return $this->belongsTo(Section::class);
     }
    public function Attendance() {
-    return $this->belongsToMany(Section::class, "attendances","student_id","section_id");
+    return $this->hasMany(Section::class);
 }
 }
