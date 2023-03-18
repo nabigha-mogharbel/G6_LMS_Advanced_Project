@@ -39,6 +39,13 @@ class AttendanceController extends Controller
         ]);
     }
     public function generateAttendance(Request $request, $date){
+        $check=Attendance::where("date",$date)->get();
+        if($check->isEmpty()){
+            return response()->json([
+                "message"=> "Records exist",
+                
+            ]);
+        } else{
         $students=Student::get();
         foreach($students as $student){
             $attendance=new Attendance;
@@ -58,7 +65,7 @@ class AttendanceController extends Controller
         "Atendance"=>$attendance,
         "section_filters"=>$sections,
         "class_filters"=>$classes
-    ]);
+    ]);}
     }
     public function updateAttendance(Request $request, $id){
         $validated=Validator::make($request->all(), [
@@ -91,17 +98,21 @@ class AttendanceController extends Controller
               [
                 "label"=> 'Present',
                 "data"=> [],
+                "backgroundColor"=>"#8A70D6"
               ],
               [
                 "label"=> 'Late',
                 "data"=> [],
+                "backgroundColor"=>"#579BE4"
             ],
               [
                 "label"=> 'Absent',
                 "data"=>[],
+                "backgroundColor"=>"#FFA600"
             ],[
                 "label"=> 'Unknown',
                 "data"=> [],
+                "backgroundColor"=>"#c4c4c4"
             ],
             ]
 ];
@@ -124,17 +135,21 @@ $Filtered=[
               [
                 "label"=> 'Present',
                 "data"=> [],
+                "backgroundColor"=>"#8A70D6"
               ],
               [
                 "label"=> 'Late',
                 "data"=> [],
+                "backgroundColor"=>"#579BE4"
             ],
               [
                 "label"=> 'Absent',
                 "data"=>[],
+                "backgroundColor"=>"#FFA600"
             ],[
                 "label"=> 'Unknown',
                 "data"=> [],
+                "backgroundColor"=>"#c4c4c4"
             ],
             ]
         ];
