@@ -81,9 +81,32 @@ class AttendanceController extends Controller
         $attendance=Attendance::where("date", $date);
         $late=$attendance->where("status", "late")->count();
         $absent=$attendance->where("status", "absent")->count();
+        $null=$attendance->where("status", "null")->count();
         $bySection=Attendance::where("date", $date)->get()->groupBy("section_id");
         $sectionsStat=[];
         $nbOfSections=$bySection->count();
+        $template=[
+            "labels"=> [],
+            "datasets"=> [
+              [
+                "label"=> 'Present',
+                "data"=> [],
+              ],
+              [
+                "label"=> 'Late',
+                "data"=> [],
+            ],
+              [
+                "label"=> 'Absent',
+                "data"=>[],
+            ],[
+                "label"=> 'Unknown',
+                "data"=> [],
+            ],
+            ]
+];
+$Filtered=[
+];
         foreach($bySection as $key => $val){
             $presentBySec=Attendance::where("date", $date)->where("section_id", $key)->where("status", "present")->count();
             $lateBySec=Attendance::where("date", $date)->where("section_id", $key)->where("status", "late")->count();
@@ -95,16 +118,67 @@ class AttendanceController extends Controller
         $byClass=Attendance::where("date", $date)->get()->groupBy("class_id");
         $classStat=[];
         $nbOfClass=$byClass->count();
+        $template2=[
+            "labels"=> [],
+            "datasets"=> [
+              [
+                "label"=> 'Present',
+                "data"=> [],
+              ],
+              [
+                "label"=> 'Late',
+                "data"=> [],
+            ],
+              [
+                "label"=> 'Absent',
+                "data"=>[],
+            ],[
+                "label"=> 'Unknown',
+                "data"=> [],
+            ],
+            ]
+        ];
+
         foreach($byClass as $key => $val){
+            $name=Classes::where("id", $key)->get();
             $presentByCla=Attendance::where("date", $date)->where("class_id", $key)->where("status", "present")->count();
             $lateByCla=Attendance::where("date", $date)->where("class_id", $key)->where("status", "late")->count();
             $absentByCla=Attendance::where("date", $date)->where("class_id", $key)->where("status", "absent")->count();
             $nullByCla=Attendance::where("date", $date)->where("class_id", $key)->where("status", "null")->count();
             $stat=["present"=>$presentByCla, "late"=>$lateByCla, "absent" => $absentByCla, "null"=>$nullByCla];
             $classStat[$key]=$stat;
+            array_push($template["labels"], $name[0]->name);
+            array_push($template["datasets"][0]["data"], $presentByCla);
+            array_push($template["datasets"][1]["data"], $lateByCla);
+            array_push($template["datasets"][2]["data"], $absentByCla);
+            array_push($template["datasets"][3]["data"], $nullByCla);
+            $groupedbySection=Attendance::where("date", $date)->where("class_id", $key)->get()->groupBy("section_id");
+            foreach($groupedbySection as $key2 => $val2){
+                            $name=Section::where("id", $key2)->get();
+            $presentByCla=Attendance::where("date", $date)->where("section_id", $key2)->where("status", "present")->count();
+            $lateByCla=Attendance::where("date", $date)->where("section_id", $key2)->where("status", "late")->count();
+            $absentByCla=Attendance::where("date", $date)->where("section_id", $key2)->where("status", "absent")->count();
+            $nullByCla=Attendance::where("date", $date)->where("section_id", $key2)->where("status", "null")->count();
+            array_push($template2["labels"], $name[0]->name);
+            array_push($template2["datasets"][0]["data"], $presentByCla);
+            array_push($template2["datasets"][1]["data"], $lateByCla);
+            array_push($template2["datasets"][2]["data"], $absentByCla);
+            array_push($template2["datasets"][3]["data"], $nullByCla);
+            }
+            array_push($Filtered, [$key=>$template2]);
+
         }
-       
-        return response()->json(["late"=>$late, "absent"=>$absent, "groupedBySection"=>$sectionsStat, "hh"=>$classStat]);
+        $allClases=Classes::get();
+        $allSections=Section::get();
+        $classRefs=[];
+        $sectionRef=[];
+        foreach($allClases as $class){
+            $classRefs[$class->id]=$class->name;
+        }
+        foreach($allSections as $section){
+            $sectionRef[$section->id."#".$section->class_id]=["name"=>$section->name, "class_id"=>$section->class_id];
+        }
+        return response()->json(["late"=>$late, "absent"=>$absent,"null"=>$null, "groupedBySection"=>$sectionsStat, "groupedByClass"=>$classStat, "classRef"=>$classRefs, "sectionRef"=> $sectionRef, "chart"=>$template, "filtered"=>$Filtered]);
     }
     public function addAttendance(Request $request){
         $validated=Validator::make($request->all(), [
