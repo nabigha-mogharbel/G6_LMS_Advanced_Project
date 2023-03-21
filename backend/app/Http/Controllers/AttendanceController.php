@@ -38,15 +38,24 @@ class AttendanceController extends Controller
     
         ]);
     }
+    public function listClassesSections(Request $request){
+        $allClases=Classes::get();
+        $allSections=Section::get();
+        $classRefs=[];
+        $sectionRef=[];
+        foreach($allClases as $class){
+            $classRefs[$class->id]=$class->name;
+        }
+        foreach($allSections as $section){
+            $sectionRef[$section->id."#".$section->class_id]=["name"=>$section->name, "class_id"=>$section->class_id];
+        }
+        $bb=Attendance::where("date","2023-03-18")->get()->groupBy("class_id","section_id");
+        return response()->json(["classes"=>$classRefs, "sections"=>$sectionRef, "bb"=>$bb]);
+    }
     public function generateAttendance(Request $request, $date){
         $check=Attendance::where("date",$date)->get();
         if($check->isEmpty()){
-            return response()->json([
-                "message"=> "Records exist",
-                
-            ]);
-        } else{
-        $students=Student::get();
+            $students=Student::get();
         foreach($students as $student){
             $attendance=new Attendance;
             $section=Section::where("id",$student->section_id)->with(["Class"])->get();
@@ -65,7 +74,14 @@ class AttendanceController extends Controller
         "Atendance"=>$attendance,
         "section_filters"=>$sections,
         "class_filters"=>$classes
-    ]);}
+    ]);
+        } else{
+        
+    return response()->json([
+        "message"=> "Records exist",
+        
+    ]);
+}
     }
     public function updateAttendance(Request $request, $id){
         $validated=Validator::make($request->all(), [
@@ -86,9 +102,9 @@ class AttendanceController extends Controller
     }
     public function dashboardData(Request $request, $date){
         $attendance=Attendance::where("date", $date);
-        $late=$attendance->where("status", "late")->count();
-        $absent=$attendance->where("status", "absent")->count();
-        $null=$attendance->where("status", "null")->count();
+        $late=Attendance::where("date", $date)->where("status", "late")->count();
+        $absent=Attendance::where("date", $date)->where("status", "absent")->count();
+        $null=Attendance::where("date", $date)->where("status", "null")->count();
         $bySection=Attendance::where("date", $date)->get()->groupBy("section_id");
         $sectionsStat=[];
         $nbOfSections=$bySection->count();
@@ -115,9 +131,9 @@ class AttendanceController extends Controller
                 "backgroundColor"=>"#c4c4c4"
             ],
             ]
-];
-$Filtered=[
-];
+    ];
+    $Filtered=[
+    ];
         foreach($bySection as $key => $val){
             $presentBySec=Attendance::where("date", $date)->where("section_id", $key)->where("status", "present")->count();
             $lateBySec=Attendance::where("date", $date)->where("section_id", $key)->where("status", "late")->count();
@@ -259,26 +275,7 @@ $Filtered=[
             'message' => 'Attendance deleted Successfully!',
         ]);
     }
-    /*public function editAttendance(Request $request, $id){
-        $validated=Validator::make($request->all(), [
-            'section_id' => 'numeric',
-            'student_id' => 'numeric',
-            'date' => 'date',
-            'status' => Rule::in(["present", "absent", "late"]),
-            $id => "numeric"
-        ]);
-        if($validated->fails()){
-            return response()->json(["message"=>$validated->errors()]);
-        }
-        $Attendance =  Attendance::find($id)->get();
-        $inputs= $request->except('_method');
-        $Attendance->update($inputs);
-        return response()->json([
-            'message' => 'Attendance edited successfully!',
-            'Attendance' => $Attendance,
 
-        ]);
-   }*/
    public function getAttendanceByStudent(Request $request, $id){
     $attendance=Attendance::where("student_id", $id)->with(["student", "section", "classes"])->get();
     return response()->json([
@@ -294,15 +291,69 @@ $Filtered=[
     ]);
    }
    public function getAttendanceByClass(Request $request, $class_id){
-    $classSections=Section::where("class_id", $class_id)->get();
-    $attendance=[];
-    foreach ($classSections as $sectionCol){
+    $template=[
+        "labels"=> [],
+        "datasets"=> [
+          [
+            "label"=> 'Present',
+            "data"=> [],
+            "backgroundColor"=>"#8A70D6"
+          ],
+          [
+            "label"=> 'Late',
+            "data"=> [],
+            "backgroundColor"=>"#579BE4"
+        ],
+          [
+            "label"=> 'Absent',
+            "data"=>[],
+            "backgroundColor"=>"#FFA600"
+        ],[
+            "label"=> 'Unknown',
+            "data"=> [],
+            "backgroundColor"=>"#c4c4c4"
+        ],
+        ]
+    ];
+    $data=[];
+    $total=[];
+    $present=Attendance::where("class_id", $class_id)->where("status", "present")->count();
+    $late=Attendance::where("class_id", $class_id)->where("status", "late")->count();
+    $absent=Attendance::where("class_id", $class_id)->where("status", "absent")->count();
+    $null=Attendance::where("class_id", $class_id)->where("status", "null")->count();
+    $classRecords=Attendance::where("class_id", $class_id)->get()->groupBy("section_id");
+    foreach($classRecords as $key => $val){
+        $byStudents=Attendance::where("section_id",$key)->get()->groupBy("student_id");
+        foreach($byStudents as $key2 => $val){
+        $presentByStu=Attendance::where("student_id", $key2)->where("status", "present")->count();
+        $lateByStu=Attendance::where("student_id", $key2)->where("status", "late")->count();
+        $absentByStu=Attendance::where("student_id", $key2)->where("status", "absent")->count();
+        $nullByStu=Attendance::where("student_id", $key2)->where("status", "null")->count();
+        $totalByStu=$presentByStu+$lateByStu+$nullByStu+$absentByStu;
+        $name=Student::where("id", $key2)->get();
+        array_push($data, ["student_id"=> $key2, "student_name"=> $name[0]->first_name." ".$name[0]->last_name, "present"=>$presentByStu, "avrP"=> $presentByStu/$totalByStu,"absent"=> $absentByStu, "avrA"=> $absentByStu/$totalByStu, "late"=>$lateByStu, "avrL"=> $lateByStu/$totalByStu, "null"=>$nullByStu, "avrN"=> $nullByStu/$totalByStu]);
+        array_push($template["datasets"][0]["data"], $presentByStu);
+        array_push($template["datasets"][1]["data"], $lateByStu);
+        array_push($template["datasets"][2]["data"], $absentByStu);
+        array_push($template["datasets"][3]["data"], $nullByStu);
+        array_push($template["labels"], $name[0]->first_name." ".$name[0]->last_name);
+        }
+        $avrPresent=array_sum($template["datasets"][0]["data"])/count($template["datasets"][0]["data"]);
+        $avrLate=array_sum($template["datasets"][1]["data"])/count($template["datasets"][1]["data"]);
+        $avrAbsent=array_sum($template["datasets"][2]["data"])/count($template["datasets"][2]["data"]);
+        $avrNull=array_sum($template["datasets"][3]["data"])/count($template["datasets"][3]["data"]);
+        array_push($total, ["section_id"=>$key, "present"=>$avrPresent, "absent"=>$avrAbsent, "late"=>$avrLate, "null"=>$avrNull]);
+       // $stat=["present"=>$presentBySec, "late"=>$lateBySec, "absent" => $absentBySec, "null"=>$nullBySec];
+        //$sectionsStat[$key]=$stat;
+    }
+    /*foreach ($classRecords as $key => $value){
         $index=$sectionCol->id;
        array_push($attendance,Attendance::where("section_id", $index)->with(["student", "section", "classes"])->get() );
-    };
+    };*/
     return response()->json([
         "message"=> "Student Attendance Records",
-        "Attendance"=>$attendance
+        "Attendance"=>$data,
+        "total"=>$total
     ]);
 }
    public function getAttendanceByDate(Request $request, $edate, $sdate){
@@ -332,6 +383,7 @@ public function getAttendanceByStudentWithDate(Request $request, $id, $edate, $s
         "message"=> "Student Attendance Records",
         "Attendance"=>$attendance
     ]);
+    
 }
 public function getAttendanceBySectionWithDate(Request $request, $id, $edate, $sdate){
     $attendance=Attendance::where("section_id", $id)->whereBetween("date",[$sdate, $edate])->with(["student", "section", "classes"])->get();
@@ -341,12 +393,67 @@ public function getAttendanceBySectionWithDate(Request $request, $id, $edate, $s
     ]);
 }
 public function getAttendanceByClassWithDate(Request $request, $class_id, $edate, $sdate){
-    $attendance=Attendance::where("class_id", $class_id)->whereBetween("date",[$sdate, $edate])->with(["student", "section", "classes"])->get();
+   /* $attendance=Attendance::where("class_id", $class_id)->whereBetween("date",[$sdate, $edate])->with(["student", "section", "classes"])->get();
     return response()->json([
         "message"=> "Student Attendance Records",
         "Attendance"=>$attendance
+    ]);*/
+
+    $template=[
+        "labels"=> [],
+        "datasets"=> [
+          [
+            "label"=> 'Present',
+            "data"=> [],
+            "backgroundColor"=>"#8A70D6"
+          ],
+          [
+            "label"=> 'Late',
+            "data"=> [],
+            "backgroundColor"=>"#579BE4"
+        ],
+          [
+            "label"=> 'Absent',
+            "data"=>[],
+            "backgroundColor"=>"#FFA600"
+        ],[
+            "label"=> 'Unknown',
+            "data"=> [],
+            "backgroundColor"=>"#c4c4c4"
+        ],
+        ]
+    ];
+    $data=[];
+    $total=[];
+    $edate=date($edate);
+    $sdate=date($sdate);
+    $classRecords=Attendance::where("class_id", $class_id)->whereBetween("date", [$edate, $sdate])->get()->groupBy("section_id");
+    foreach($classRecords as $key => $val){
+        $byStudents=Attendance::where("section_id",$key)->whereBetween("date", [$edate,$sdate])->get()->groupBy("student_id");
+        foreach($byStudents as $key2 => $val){
+        $presentByStu=Attendance::where("student_id", $key2)->whereBetween("date", [$edate,$sdate])->where("status", "present")->count();
+        $lateByStu=Attendance::where("student_id", $key2)->whereBetween("date", [$edate,$sdate])->where("status", "late")->count();
+        $absentByStu=Attendance::where("student_id", $key2)->whereBetween("date", [$edate,$sdate])->where("status", "absent")->count();
+        $nullByStu=Attendance::where("student_id", $key2)->whereBetween("date", [$edate,$sdate])->where("status", "null")->count();
+        $totalByStu=$presentByStu+$lateByStu+$nullByStu+$absentByStu;
+        if($totalByStu===0){$totalByStu=1;}
+        $totalByStu=1;
+        $name=Student::where("id", $key2)->get();
+        array_push($data, ["student_id"=> $key2, "student_name"=> $name[0]->first_name." ".$name[0]->last_name, "present"=>$presentByStu, "avrP"=> $presentByStu/$totalByStu,"absent"=> $absentByStu, "avrA"=> $absentByStu/$totalByStu, "late"=>$lateByStu, "avrL"=> $lateByStu/$totalByStu, "null"=>$nullByStu, "avrN"=> $nullByStu/$totalByStu]);
+        }
+        /*$avrPresent=array_sum($template["datasets"][0]["data"])/count($template["datasets"][0]["data"]);
+        $avrLate=array_sum($template["datasets"][1]["data"])/count($template["datasets"][1]["data"]);
+        $avrAbsent=array_sum($template["datasets"][2]["data"])/count($template["datasets"][2]["data"]);
+        $avrNull=array_sum($template["datasets"][3]["data"])/count($template["datasets"][3]["data"]);
+        array_push($total, ["section_id"=>$key, "present"=>$avrPresent, "absent"=>$avrAbsent, "late"=>$avrLate, "null"=>$avrNull]);*/
+    }
+    return response()->json([
+        "message"=> "Student Attendance Records",
+        "Attendance"=>$data,
+        "total"=>$total,
+        "edate"=>$edate,
+        "sdate"=>$sdate
     ]);
 }
-//updateAttendanceBySSD
 
 }

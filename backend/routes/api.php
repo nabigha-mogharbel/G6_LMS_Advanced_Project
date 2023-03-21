@@ -72,4 +72,5 @@ Route::group([
     Route::Patch("/attendance/update/{id}", [AttendanceController::class, "updateAttendance"]);
     Route::Patch("/attendance/update/student/{student_id}/section/{section_id}/date/{date}", [AttendanceController::class, "updateAttendanceBySSD"]);
     Route::Get("/dashboard/{date}", [AttendanceController::class, "dashboardData"]);
+    Route::Get("/reportlists", [AttendanceController::class, "listClassesSections"]);
 });
