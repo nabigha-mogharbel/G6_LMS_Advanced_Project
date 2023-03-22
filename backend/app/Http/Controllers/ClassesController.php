@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Classes;
+use App\Models\Section;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 class ClassesController extends Controller
@@ -43,7 +44,7 @@ class ClassesController extends Controller
         ], 200);
     }
 
-    public function getClassSort(Request $request)
+    public function getClassSortByName(Request $request)
     {
         $classes = Classes::orderBy('name')->paginate(5);
         return response()->json([
@@ -81,10 +82,17 @@ class ClassesController extends Controller
                 'message' => "Class doesn't exists",
             ], 400);
         }
-        $Classes->delete();
+        $Sections = Section::where("class_id",$id)->get();
+        if($Sections->isEmpty()){
+            $Classes->delete();
         return response()->json([
             "message" => "Classes Deleted Successfully!"
         ], 200);
+        }else{return response()->json([
+            'message' => "You can't delete a class that contains sections",
+        ], 410);}
+        
+        ;
     }
 
     public function updateClass(Request $request, $id)

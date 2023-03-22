@@ -33,7 +33,7 @@ Route::group([
 
     Route::Post('/classes', [ClassesController::class, 'AddClass']);    
     Route::Get('/classes', [ClassesController::class, 'GetClass']);
-    Route::Get('/classes/sort', [ClassesController::class, 'GetClassSort']);
+    Route::Get('/classes/sort/name', [ClassesController::class, 'GetClassSortByName']);
     Route::Get('/classes/sort/floor', [ClassesController::class, 'getClassSortByFloor']);
 
     Route::Get('/classes/{id}', [ClassesController::class, 'getClassById']);
@@ -50,6 +50,9 @@ Route::group([
     Route::Post('/sections', [SectionController::class, 'addSection']);
     Route::Get('/sections', [SectionController::class, 'getAllSection']);
     Route::Get('/sections/{id}', [SectionController::class, 'getSection']);
+    Route::Get('/sections/sort/name', [SectionController::class, 'getSectionSortByName']);
+    Route::Get('/sections/sort/capacity', [SectionController::class, 'getSectionSortByCapacity']);
+    Route::Get('/sections/sort/class', [SectionController::class, 'getSectionSortByClass']);
     Route::Patch('/sections/{id}', [SectionController::class, 'editSection']);
     Route::delete('/sections/{id}', [SectionController::class, 'deleteSection']);
 
@@ -61,7 +64,8 @@ Route::group([
     Route::Get("/attendance/start-date/{sdate}/end-date/{edate}", [AttendanceController::class, "getAttendanceByDate"]);
     Route::Get("/attendance/section/{section_id}", [AttendanceController::class, "getAttendanceBySection"]);
     Route::Get("/attendance/student/{student_id}", [AttendanceController::class, "getAttendanceByStudent"]);
-    Route::Get("/attendance/class/{class_id}", [AttendanceController::class, "getAttendanceByClass"]);
+    Route::Get("/attendance/class/{class_id}/date/{date}", [AttendanceController::class, "getAttendanceByClass"]);
+    Route::Get("/attendance/report/class/{class_id}", [AttendanceController::class, "getAttendanceReportByClass"]);
    /* Route::Get("/attendance/class/{class_id}/today/{date}", [AttendanceController::class, "getAttendanceByClassWithToday"]);
     Route::Get("/attendance/class/{section_id}/today/{date}", [AttendanceController::class, "getAttendanceBySectionWithToday"]);
     Route::Get("/attendance/class/{student_name}/today/{date}", [AttendanceController::class, "getAttendanceByStudentNameWithToday"]);*/

@@ -47,7 +47,7 @@ class AttendanceController extends Controller
             $classRefs[$class->id]=$class->name;
         }
         foreach($allSections as $section){
-            $sectionRef[$section->id."#".$section->class_id]=["name"=>$section->name, "class_id"=>$section->class_id];
+            $sectionRef[$section->id]=["name"=>$section->name, "class_id"=>$section->class_id];
         }
         $bb=Attendance::where("date","2023-03-18")->get()->groupBy("class_id","section_id");
         return response()->json(["classes"=>$classRefs, "sections"=>$sectionRef, "bb"=>$bb]);
@@ -290,7 +290,16 @@ class AttendanceController extends Controller
         "Attendance"=>$attendance
     ]);
    }
-   public function getAttendanceByClass(Request $request, $class_id){
+   public function getAttendanceByClass(Request $request, $class_id, $date){
+    $attendance=Attendance::where("class_id", $class_id)->where("date", $date)->with(["student", "section", "classes"])->get();
+    return response()->json([
+        "message"=> "Student Attendance Records",
+        "Attendance"=>$attendance
+    ]);
+
+
+}
+public function getAttendanceReportByClass(Request $request, $class_id){
     $template=[
         "labels"=> [],
         "datasets"=> [
