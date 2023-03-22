@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Section;
+use App\Models\Student;
 use App\Models\Classes;
 use Illuminate\Support\Facades\Validator;
 class SectionController extends Controller
@@ -20,7 +21,7 @@ class SectionController extends Controller
             "class_id" => "required|numeric"
         ]);
         if($validated->fails()){
-            return response()->json(["message"=>$validated->errors()]);
+            return response()->json(["message"=>$validated->errors()], 422);
         }
         $Section = new Section;
         $name = $request->input('name');
@@ -123,19 +124,46 @@ class SectionController extends Controller
 
     public function deleteSection(Request $request, $id)
     {
-        $Section = Section::find($id);
-        if(empty($Section)){
+        $Section = Section::where("id",$id)->get();
+        $Section2 = Section::find($id);
+        if(empty($Section2)){
             return response()->json([
                 'message' => "Section doesn't exists",
             ], 400);
         }
-        $Section->delete();
+        $Sections = Student::where("section_id",$id)->get();
+        if($Sections->isEmpty()){
+            $Section2->delete();
         return response()->json([
-            'message' => 'Section deleted Successfully!',
+            'message' => 'Section deleted Successfully || batata!',
         ]);
+        }else{
+
+            return response()->json([
+                'message' => "You can't delete a section that contains students",
+            ], 410);
+        }
+        
     }
 
-
+    public function getSectionSortByName(Request $request){
+        $Section =  Section::with(["Class"])->orderBy("name")->paginate(5);
+        return response()->json([
+            'message' => $Section,
+        ]);
+    }
+    public function getSectionSortByClass(Request $request){
+        $Section =  Section::with(["Class"])->orderBy("class.name")->paginate(5);
+        return response()->json([
+            'message' => $Section,
+        ]);
+    }
+    public function getSectionSortByCapacity(Request $request){
+        $Section =  Section::with(["Class"])->orderBy("capacity")->paginate(5);
+        return response()->json([
+            'message' => $Section,
+        ]);
+    }
     public function editSection(Request $request, $id)
     {
         $validated=Validator::make($request->all(), [
